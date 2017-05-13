@@ -1,0 +1,19 @@
+{
+    "name": "superv/composer-plugin",
+    "type": "composer-plugin",
+    "require": {
+        "composer-plugin-api": "^1.0"
+    },
+    "require-dev": {
+        "composer/composer": "1.0.*@dev"
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "autoload": {
+        "psr-4": {
+            "Superv\\ComposerPlugin\\": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
