@@ -19,8 +19,8 @@ class DropletInstaller extends LibraryInstaller
      */
     protected $types = [
         'port',
+        'agent',
         'droplet',
-        'micro_service',
         'plugin',
         'theme',
     ];
@@ -54,25 +54,25 @@ class DropletInstaller extends LibraryInstaller
     {
         $name = $package->getPrettyName();
 
-        $parts = explode('/', $name);
+        list($vendor, $identity) = explode('/', $name);
 
-        if (count($parts) != 2) {
+        if (!$vendor || !$identity) {
             throw new \InvalidArgumentException(
                 "Invalid package name [{$name}]. Should be in the form of vendor/package"
             );
         }
 
-        $packageName = $parts[1];
-
-        preg_match($this->getRegex(), $packageName, $match);
+        preg_match($this->getRegex(), $identity, $match);
 
         if (count($match) != 3) {
             throw new \InvalidArgumentException(
-                "Invalid droplet package name [{$name}]. Should be in the form of name-type [{$packageName}]."
+                "Invalid droplet package name [{$name}]. Should be in the form of name-type [{$identity}]."
             );
         }
+        
+        list($name, $type) = explode('-', $identity);
 
-        return "droplets/{$parts[0]}/{$parts[1]}";
+        return "droplets/{$vendor}/{$type}s/{$name}";
     }
 
     /**
