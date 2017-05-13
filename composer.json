@@ -15,5 +15,11 @@
             "Superv\\ComposerPlugin\\": "src/"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "extra": {
+        "class": "SuperV\\ComposerPlugin\\Plugin",
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
+    }
 }
