@@ -12,7 +12,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Superv\\ComposerPlugin\\": "src/"
+            "SuperV\\ComposerPlugin\\": "src/"
         }
     },
     "minimum-stability": "dev",
