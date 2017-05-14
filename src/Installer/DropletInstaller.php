@@ -11,7 +11,6 @@ use Composer\Repository\InstalledRepositoryInterface;
  */
 class DropletInstaller extends LibraryInstaller
 {
-
     /**
      * Droplet types
      *
@@ -24,7 +23,53 @@ class DropletInstaller extends LibraryInstaller
         'plugin',
         'theme',
     ];
-
+    
+    public function isInstalled(InstalledRepositoryInterface $repo, PackageInterface $package)
+    {
+        return file_exists(str_replace('droplets', 'workbench',
+                $this->getInstallPath($package))) || parent::isInstalled($repo, $package);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public function getInstallPath(PackageInterface $package)
+    {
+        $name = $package->getPrettyName();
+        
+        list($vendor, $identity) = explode('/', $name);
+        
+        if (!$vendor || !$identity) {
+            throw new \InvalidArgumentException(
+                "Invalid package name [{$name}]. Should be in the form of vendor/package"
+            );
+        }
+        
+        preg_match($this->getRegex(), $identity, $match);
+        
+        if (count($match) != 3) {
+            throw new \InvalidArgumentException(
+                "Invalid droplet package name [{$name}]. Should be in the form of name-type [{$identity}]."
+            );
+        }
+        
+        list($name, $type) = explode('-', $identity);
+        
+        return "droplets/{$vendor}/{$type}s/{$name}";
+    }
+    
+    /**
+     * Get regex
+     *
+     * @return string
+     */
+    public function getRegex()
+    {
+        $types = $this->getTypes();
+        
+        return "/^([a-zA-Z1-9-_]+)-({$types})$/";
+    }
+    
     /**
      * Get types
      *
@@ -34,47 +79,7 @@ class DropletInstaller extends LibraryInstaller
     {
         return implode('|', $this->types);
     }
-
-    /**
-     * Get regex
-     *
-     * @return string
-     */
-    public function getRegex()
-    {
-        $types = $this->getTypes();
-
-        return "/^([a-zA-Z1-9-_]+)-({$types})$/";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getInstallPath(PackageInterface $package)
-    {
-        $name = $package->getPrettyName();
-
-        list($vendor, $identity) = explode('/', $name);
-
-        if (!$vendor || !$identity) {
-            throw new \InvalidArgumentException(
-                "Invalid package name [{$name}]. Should be in the form of vendor/package"
-            );
-        }
-
-        preg_match($this->getRegex(), $identity, $match);
-
-        if (count($match) != 3) {
-            throw new \InvalidArgumentException(
-                "Invalid droplet package name [{$name}]. Should be in the form of name-type [{$identity}]."
-            );
-        }
-        
-        list($name, $type) = explode('-', $identity);
-
-        return "droplets/{$vendor}/{$type}s/{$name}";
-    }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -82,7 +87,7 @@ class DropletInstaller extends LibraryInstaller
     {
         return 'superv-droplet' === $packageType;
     }
-
+    
     /**
      * Update is enabled
      *
@@ -92,7 +97,7 @@ class DropletInstaller extends LibraryInstaller
     {
         return $this->composer->getConfig()->get('superv-composer-plugin-update');
     }
-
+    
     /**
      * Do NOT update droplets
      *
