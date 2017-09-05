@@ -22,6 +22,7 @@ class DropletInstaller extends LibraryInstaller
         'droplet',
         'plugin',
         'theme',
+        'module',
     ];
     
     public function isInstalled(InstalledRepositoryInterface $repo, PackageInterface $package)
