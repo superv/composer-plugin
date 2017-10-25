@@ -4,11 +4,6 @@ use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 
-/**
- * Class DropletInstaller
- *
- * @package Anomaly\StreamsComposerPlugin\Installer
- */
 class DropletInstaller extends LibraryInstaller
 {
     /**
@@ -24,41 +19,68 @@ class DropletInstaller extends LibraryInstaller
         'theme',
         'module',
     ];
-    
+
+    protected function isUnderDevelopment(PackageInterface $package)
+    {
+        $path = str_replace('droplets', 'workbench', $this->getInstallPath($package));
+        echo $path."\r";
+
+        return file_exists($path);
+    }
+
     public function isInstalled(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
-        return file_exists(str_replace('droplets', 'workbench',
-                $this->getInstallPath($package))) || parent::isInstalled($repo, $package);
+        return $this->isUnderDevelopment($package) || parent::isInstalled($repo, $package);
     }
-    
+
+    public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
+    {
+        if ($this->isUnderDevelopment($package)) {
+            return;
+        }
+
+        parent::install($repo, $package);
+    }
+
     /**
      * {@inheritDoc}
      */
     public function getInstallPath(PackageInterface $package)
     {
         $name = $package->getPrettyName();
-        
+
         list($vendor, $identity) = explode('/', $name);
-        
-        if (!$vendor || !$identity) {
+
+        if (! $vendor || ! $identity) {
             throw new \InvalidArgumentException(
                 "Invalid package name [{$name}]. Should be in the form of vendor/package"
             );
         }
-        
+
         preg_match($this->getRegex(), $identity, $match);
-        
+
         if (count($match) != 3) {
             throw new \InvalidArgumentException(
                 "Invalid droplet package name [{$name}]. Should be in the form of name-type [{$identity}]."
             );
         }
-        
+
         list($name, $type) = explode('-', $identity);
-        
-        return "droplets/{$vendor}/{$type}s/{$name}";
+
+        $vendorPath = "{$vendor}/{$type}s/{$name}";
+
+        /**
+         * if package already exists in workbench folder,
+         * that means it is under development, so we
+         * should return this path
+         */
+//        if (file_exists("workbench/{$vendorPath}")) {
+//            return "workbench/{$vendorPath}";
+//        }
+
+        return "droplets/{$vendorPath}";
     }
-    
+
     /**
      * Get regex
      *
@@ -67,10 +89,10 @@ class DropletInstaller extends LibraryInstaller
     public function getRegex()
     {
         $types = $this->getTypes();
-        
+
         return "/^([a-zA-Z1-9-_]+)-({$types})$/";
     }
-    
+
     /**
      * Get types
      *
@@ -80,7 +102,7 @@ class DropletInstaller extends LibraryInstaller
     {
         return implode('|', $this->types);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -88,7 +110,7 @@ class DropletInstaller extends LibraryInstaller
     {
         return 'superv-droplet' === $packageType;
     }
-    
+
     /**
      * Update is enabled
      *
@@ -98,7 +120,7 @@ class DropletInstaller extends LibraryInstaller
     {
         return $this->composer->getConfig()->get('superv-composer-plugin-update');
     }
-    
+
     /**
      * Do NOT update droplets
      *
@@ -107,8 +129,9 @@ class DropletInstaller extends LibraryInstaller
      */
     public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
     {
-        if (true) {
-            parent::update($repo, $initial, $target);
+        if ($this->isUnderDevelopment($initial)) {
+            return;
         }
+        parent::update($repo, $initial, $target);
     }
 }
