@@ -23,7 +23,6 @@ class DropletInstaller extends LibraryInstaller
     protected function isUnderDevelopment(PackageInterface $package)
     {
         $path = str_replace('droplets', 'workbench', $this->getInstallPath($package));
-        echo $path."\r";
 
         return file_exists($path);
     }
