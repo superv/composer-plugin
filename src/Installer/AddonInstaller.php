@@ -4,7 +4,7 @@ use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 
-class DropletInstaller extends LibraryInstaller
+class AddonInstaller extends LibraryInstaller
 {
     /**
      * Droplet types
@@ -12,17 +12,17 @@ class DropletInstaller extends LibraryInstaller
      * @var array
      */
     protected $types = [
-        'port',
+        'addon',
         'agent',
-        'droplet',
-        'plugin',
-        'theme',
         'module',
+        'plugin',
+        'resource',
+        'theme',
     ];
 
     protected function isUnderDevelopment(PackageInterface $package)
     {
-        $path = str_replace('droplets', 'workbench', $this->getInstallPath($package));
+        $path = str_replace('addons', 'workbench', $this->getInstallPath($package));
 
         return file_exists($path);
     }
@@ -60,7 +60,7 @@ class DropletInstaller extends LibraryInstaller
 
         if (count($match) != 3) {
             throw new \InvalidArgumentException(
-                "Invalid droplet package name [{$name}]. Should be in the form of name-type [{$identity}]."
+                "Invalid addon package name [{$name}]. Should be in the form of name-type [{$identity}]."
             );
         }
 
@@ -77,7 +77,7 @@ class DropletInstaller extends LibraryInstaller
 //            return "workbench/{$vendorPath}";
 //        }
 
-        return "droplets/{$vendorPath}";
+        return "addons/{$vendorPath}";
     }
 
     /**
@@ -107,7 +107,7 @@ class DropletInstaller extends LibraryInstaller
      */
     public function supports($packageType)
     {
-        return 'superv-droplet' === $packageType;
+        return 'superv-addon' === $packageType;
     }
 
     /**
@@ -121,7 +121,7 @@ class DropletInstaller extends LibraryInstaller
     }
 
     /**
-     * Do NOT update droplets
+     * Do NOT update addons
      *
      * @param PackageInterface $initial
      * @param PackageInterface $target

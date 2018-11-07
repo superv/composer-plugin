@@ -20,7 +20,7 @@ class Plugin implements PluginInterface
      * @var array
      */
     protected $installers = [
-        'DropletInstaller'
+        'AddonInstaller'
     ];
 
     /**
