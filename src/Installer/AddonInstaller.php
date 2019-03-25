@@ -7,12 +7,13 @@ use Composer\Repository\InstalledRepositoryInterface;
 class AddonInstaller extends LibraryInstaller
 {
     /**
-     * Droplet types
+     * Addon types
      *
      * @var array
      */
     protected $types = [
         'addon',
+        'drop',
         'agent',
         'module',
         'plugin',
@@ -67,15 +68,6 @@ class AddonInstaller extends LibraryInstaller
         list($name, $type) = explode('-', $identity);
 
         $vendorPath = "{$vendor}/{$type}s/{$name}";
-
-        /**
-         * if package already exists in workbench folder,
-         * that means it is under development, so we
-         * should return this path
-         */
-//        if (file_exists("workbench/{$vendorPath}")) {
-//            return "workbench/{$vendorPath}";
-//        }
 
         return "addons/{$vendorPath}";
     }
