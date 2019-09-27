@@ -99,7 +99,7 @@ class AddonInstaller extends LibraryInstaller
      */
     public function supports($packageType)
     {
-        return 'superv-addon' === $packageType;
+        return preg_match('/^superv-([\w\-]+)$/', $packageType);
     }
 
     /**
