@@ -58,7 +58,7 @@ class AddonInstaller extends LibraryInstaller
         }
 
         $type = $package->getType();
-        if (preg_match('/^superv-([\w\-]+)$/', $type, $match)) {
+        if (! preg_match('/^superv-([\w\-]+)$/', $type, $match)) {
             throw new \InvalidArgumentException(
                 "Invalid superV package type [{$type}]. Type should be in the form of superv-{type}."
             );
