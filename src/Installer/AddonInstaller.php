@@ -57,17 +57,16 @@ class AddonInstaller extends LibraryInstaller
             );
         }
 
-        preg_match($this->getRegex(), $identity, $match);
-
-        if (count($match) != 3) {
+        $type = $package->getType();
+        if (preg_match('/^superv-([\w\-]+)$/', $type, $match)) {
             throw new \InvalidArgumentException(
-                "Invalid addon package name [{$name}]. Should be in the form of name-type [{$identity}]."
+                "Invalid superV package type [{$type}]. Type should be in the form of superv-{type}."
             );
         }
 
-        list($name, $type) = explode('-', $identity);
+        $type = $match[1];
 
-        $vendorPath = "{$vendor}/{$type}s/{$name}";
+        $vendorPath = "{$vendor}/{$type}s/{$identity}";
 
         return "addons/{$vendorPath}";
     }
