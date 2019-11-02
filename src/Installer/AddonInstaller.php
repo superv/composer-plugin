@@ -66,6 +66,10 @@ class AddonInstaller extends LibraryInstaller
 
         $type = $match[1];
 
+        if ($type === 'tool') {
+            return 'tools/{$vendor}/{$identity}';
+        }
+
         $vendorPath = "{$vendor}/{$type}s/{$identity}";
 
         return "addons/{$vendorPath}";
