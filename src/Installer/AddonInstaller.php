@@ -21,13 +21,6 @@ class AddonInstaller extends LibraryInstaller
         'theme',
     ];
 
-    protected function isUnderDevelopment(PackageInterface $package)
-    {
-        $path = str_replace('addons', 'workbench', $this->getInstallPath($package));
-
-        return file_exists($path);
-    }
-
     public function isInstalled(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         return $this->isUnderDevelopment($package) || parent::isInstalled($repo, $package);
@@ -67,12 +60,34 @@ class AddonInstaller extends LibraryInstaller
         $type = $match[1];
 
         if ($type === 'tool') {
-            return 'tools/{$vendor}/{$identity}';
+            return sprintf("tools/%s/%s", $vendor, $identity);
         }
 
-        $vendorPath = "{$vendor}/{$type}s/{$identity}";
+        $pluralType = $type.'s';
 
-        return "addons/{$vendorPath}";
+        return sprintf("addons/%s/%s/%s", $vendor, $pluralType, $identity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supports($packageType)
+    {
+        return preg_match('/^superv-([\w\-]+)$/', $packageType);
+    }
+
+    /**
+     * Do NOT update addons
+     *
+     * @param PackageInterface $initial
+     * @param PackageInterface $target
+     */
+    public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
+    {
+        if ($this->isUnderDevelopment($initial)) {
+            return;
+        }
+        parent::update($repo, $initial, $target);
     }
 
     /**
@@ -98,14 +113,6 @@ class AddonInstaller extends LibraryInstaller
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function supports($packageType)
-    {
-        return preg_match('/^superv-([\w\-]+)$/', $packageType);
-    }
-
-    /**
      * Update is enabled
      *
      * @return mixed|null
@@ -115,17 +122,10 @@ class AddonInstaller extends LibraryInstaller
         return $this->composer->getConfig()->get('superv-composer-plugin-update');
     }
 
-    /**
-     * Do NOT update addons
-     *
-     * @param PackageInterface $initial
-     * @param PackageInterface $target
-     */
-    public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
+    protected function isUnderDevelopment(PackageInterface $package)
     {
-        if ($this->isUnderDevelopment($initial)) {
-            return;
-        }
-        parent::update($repo, $initial, $target);
+        $path = str_replace('addons', 'workbench', $this->getInstallPath($package));
+
+        return file_exists($path);
     }
 }
