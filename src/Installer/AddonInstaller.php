@@ -16,19 +16,19 @@ class AddonInstaller extends LibraryInstaller
         'drop',
         'agent',
         'module',
-        'plugin',
-        'resource',
+        'panel',
         'theme',
     ];
 
     public function isInstalled(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
-        return $this->isUnderDevelopment($package) || parent::isInstalled($repo, $package);
+        return parent::isInstalled($repo, $package);
+//        return $this->isAddonInstalled($package) || parent::isInstalled($repo, $package);
     }
 
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
-        if ($this->isUnderDevelopment($package)) {
+        if ($this->isAddonInstalled($package)) {
             return;
         }
 
@@ -77,14 +77,11 @@ class AddonInstaller extends LibraryInstaller
     }
 
     /**
-     * Do NOT update addons
-     *
-     * @param PackageInterface $initial
-     * @param PackageInterface $target
+     * {@inheritDoc}
      */
     public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
     {
-        if ($this->isUnderDevelopment($initial)) {
+        if ($this->isAddonInstalled($initial)) {
             return;
         }
         parent::update($repo, $initial, $target);
@@ -122,7 +119,7 @@ class AddonInstaller extends LibraryInstaller
         return $this->composer->getConfig()->get('superv-composer-plugin-update');
     }
 
-    protected function isUnderDevelopment(PackageInterface $package)
+    protected function isAddonInstalled(PackageInterface $package)
     {
         $path = str_replace('addons', 'workbench', $this->getInstallPath($package));
 
