@@ -42,9 +42,9 @@ class AddonInstaller extends LibraryInstaller
     {
         $name = $package->getPrettyName();
 
-        list($vendor, $identity) = explode('/', $name);
+        list($vendor, $packageName) = explode('/', $name);
 
-        if (! $vendor || ! $identity) {
+        if (! $vendor || ! $packageName) {
             throw new \InvalidArgumentException(
                 "Invalid package name [{$name}]. Should be in the form of vendor/package"
             );
@@ -60,12 +60,15 @@ class AddonInstaller extends LibraryInstaller
         $type = $match[1];
 
         if ($type === 'tool') {
-            return sprintf("tools/%s/%s", $vendor, $identity);
+            return sprintf("tools/%s/%s", $vendor, $packageName);
         }
 
         $pluralType = $type.'s';
 
-        return sprintf("addons/%s/%s/%s", $vendor, $pluralType, $identity);
+        // strip trailing -type from package name
+        $addonName = str_replace('-'.$type, '', $packageName);
+
+        return sprintf("addons/%s/%s/%s", $vendor, $pluralType, $addonName);
     }
 
     /**
