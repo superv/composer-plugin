@@ -2,7 +2,7 @@
     "name": "superv/composer-plugin",
     "type": "composer-plugin",
     "require": {
-        "composer-plugin-api": "^1.1"
+        "composer-plugin-api": "^2.3"
     },
     "autoload": {
         "psr-4": {
