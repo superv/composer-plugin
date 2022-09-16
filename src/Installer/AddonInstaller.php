@@ -20,20 +20,6 @@ class AddonInstaller extends LibraryInstaller
         'theme',
     ];
 
-    public function isInstalled(InstalledRepositoryInterface $repo, PackageInterface $package)
-    {
-        return parent::isInstalled($repo, $package);
-//        return $this->isAddonInstalled($package) || parent::isInstalled($repo, $package);
-    }
-
-    public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
-    {
-        if ($this->isAddonInstalled($package)) {
-            return;
-        }
-
-        parent::install($repo, $package);
-    }
 
     /**
      * {@inheritDoc}
